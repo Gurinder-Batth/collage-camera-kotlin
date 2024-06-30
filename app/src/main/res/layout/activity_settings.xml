@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/grey"
+    tools:context=".SettingsActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        app:subtitleTextColor="@color/white"
+        app:titleTextColor="@color/white"
+        android:backgroundTint="@color/grey"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary" />
+
+      <ScrollView
+          android:layout_below="@+id/toolbar"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent">
+          <LinearLayout
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+              <RelativeLayout
+                  android:layout_below="@+id/toolbar"
+                  android:id="@+id/layout_1"
+                  android:layout_weight="1"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:padding="2dp">
+                  <TextView
+                      android:id="@+id/labelSeparatePhotos"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Separate Photos"
+                      android:fontFamily="casual"
+                      android:textColor="@color/white"
+                      android:textSize="18sp"
+                      android:textStyle="bold"
+                      android:layout_alignParentTop="true"
+                      android:layout_centerHorizontal="true"
+                      android:layout_marginBottom="16dp"/>
+
+                  <!-- Switch Button -->
+                  <Switch
+                      android:onClick="separatePhotosToggleView"
+                      android:id="@+id/separateBtn"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:thumb="@drawable/switch_thumb_custom"
+                      android:textOff="Off"
+                      android:textOn="On"
+                      android:checked="false"
+                      android:layout_below="@id/labelSeparatePhotos"
+                      android:layout_centerHorizontal="true"/>
+
+                  <View
+                      android:layout_marginTop="20dp"
+                      android:background="@color/white"
+                      android:layout_below="@+id/separateBtn"
+                      android:layout_width="match_parent"
+                      android:layout_height="2dp" />
+              </RelativeLayout>
+
+
+              <RelativeLayout
+                  android:id="@+id/layout_2"
+                  android:layout_below="@+id/layout_1"
+                  android:layout_weight="1"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:padding="2dp">
+                  <TextView
+
+                      android:fontFamily="casual"
+                      android:id="@+id/shutterSound"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Shutter Sound"
+                      android:textColor="@color/white"
+                      android:textSize="18sp"
+                      android:textStyle="bold"
+                      android:layout_alignParentTop="true"
+                      android:layout_centerHorizontal="true"
+                      android:layout_marginBottom="16dp"/>
+
+                  <!-- Switch Button -->
+                  <Switch
+                      android:onClick="shutterSoundToggleView"
+                      android:id="@+id/shutterSoundBtn"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:thumb="@drawable/switch_thumb_custom"
+                      android:textOff="Off"
+                      android:textOn="On"
+                      android:checked="false"
+                      android:layout_below="@id/shutterSound"
+                      android:layout_centerHorizontal="true"/>
+
+
+                  <View
+                      android:layout_marginTop="20dp"
+                      android:background="@color/white"
+                      android:layout_below="@+id/shutterSoundBtn"
+                      android:layout_width="match_parent"
+                      android:layout_height="2dp" />
+              </RelativeLayout>
+
+
+              <RelativeLayout
+                  android:layout_below="@+id/layout_2"
+                  android:id="@+id/layout_3"
+                  android:layout_weight="1"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:padding="2dp">
+                  <TextView
+
+                      android:fontFamily="casual"
+                      android:id="@+id/flash_on"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Flash Light"
+                      android:textColor="@color/white"
+                      android:textSize="18sp"
+                      android:textStyle="bold"
+                      android:layout_alignParentTop="true"
+                      android:layout_centerHorizontal="true"
+                      android:layout_marginBottom="16dp"/>
+
+                  <!-- Switch Button -->
+                  <Switch
+                      android:id="@+id/flashOnBtn"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:thumb="@drawable/switch_thumb_custom"
+                      android:textOff="Off"
+                      android:textOn="On"
+                      android:checked="false"
+                      android:onClick="flashToggleView"
+                      android:layout_below="@id/flash_on"
+                      android:layout_centerHorizontal="true"/>
+
+                  <View
+                      android:layout_marginTop="20dp"
+                      android:background="@color/white"
+                      android:layout_below="@+id/flashOnBtn"
+                      android:layout_width="match_parent"
+                      android:layout_height="2dp" />
+              </RelativeLayout>
+
+
+              <RelativeLayout
+                  android:id="@+id/layout_4"
+                  android:layout_below="@+id/layout_3"
+                  android:layout_weight="1"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:padding="2dp">
+                  <TextView
+
+                      android:fontFamily="casual"
+                      android:id="@+id/border"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Border Apply"
+                      android:textColor="@color/white"
+                      android:textSize="18sp"
+                      android:textStyle="bold"
+                      android:layout_alignParentTop="true"
+                      android:layout_centerHorizontal="true"
+                      android:layout_marginBottom="16dp"/>
+
+                  <!-- Switch Button -->
+                  <Switch
+
+                      android:onClick="borderToggleView"
+                      android:id="@+id/border_btn"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:thumb="@drawable/switch_thumb_custom"
+                      android:textOff="Off"
+                      android:textOn="On"
+                      android:checked="false"
+                      android:layout_below="@id/border"
+                      android:layout_centerHorizontal="true"/>
+
+                  <View
+                      android:layout_marginTop="20dp"
+                      android:background="@color/white"
+                      android:layout_below="@+id/border_btn"
+                      android:layout_width="match_parent"
+                      android:layout_height="2dp" />
+              </RelativeLayout>
+
+
+              <RelativeLayout
+                  android:id="@+id/layout_grid"
+                  android:layout_below="@+id/layout_4"
+                  android:layout_weight="1"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:padding="2dp">
+                  <TextView
+
+                      android:fontFamily="casual"
+                      android:id="@+id/grid_text"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Grid On"
+                      android:textColor="@color/white"
+                      android:textSize="18sp"
+                      android:textStyle="bold"
+                      android:layout_alignParentTop="true"
+                      android:layout_centerHorizontal="true"
+                      android:layout_marginBottom="16dp"/>
+
+                  <!-- Switch Button -->
+                  <Switch
+
+                      android:onClick="gridToggleView"
+                      android:id="@+id/grid_btn"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:thumb="@drawable/switch_thumb_custom"
+                      android:textOff="Off"
+                      android:textOn="On"
+                      android:checked="false"
+                      android:layout_below="@id/grid_text"
+                      android:layout_centerHorizontal="true"/>
+
+                  <View
+                      android:layout_marginTop="20dp"
+                      android:background="@color/white"
+                      android:layout_below="@+id/grid_btn"
+                      android:layout_width="match_parent"
+                      android:layout_height="2dp" />
+              </RelativeLayout>
+
+
+              <RelativeLayout
+                  android:id="@+id/layout_5"
+                  android:layout_below="@+id/layout_grid"
+                  android:layout_weight="1"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:padding="16dp">
+
+                  <TextView
+                      android:id="@+id/rateus"
+                      android:gravity="center"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="⭐ Rate Us"
+                      android:textColor="@color/white"
+                      android:textSize="18sp"
+                      android:textStyle="bold"/>
+
+
+                  <TextView
+                      android:layout_marginTop="10dp"
+                      android:layout_below="@+id/rateus"
+                      android:id="@+id/about"
+                      android:gravity="center"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="If you find any bug or error, please mail:"
+                      android:textColor="@color/white"
+                      android:textSize="18sp"
+                      android:textStyle="bold"/>
+
+                  <TextView
+
+                      android:textAlignment="center"
+                      android:gravity="center"
+                      android:layout_below="@+id/about"
+                      android:id="@+id/about_email"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="india@fennecstereo.com"
+                      android:textColor="@color/white"
+                      android:textSize="18sp"
+                      android:textStyle="bold"
+                      android:layout_marginBottom="16dp"/>
+
+              </RelativeLayout>
+          </LinearLayout>
+      </ScrollView>
+
+
+</RelativeLayout>
