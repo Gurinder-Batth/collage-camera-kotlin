@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Switch
 import android.widget.TextView
+import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
 
 
@@ -64,7 +65,7 @@ class SettingsActivity : AppCompatActivity() {
             editor.putBoolean("borderOn", isBorderOn)
             editor.apply()
         }
-        findViewById<Switch>(R.id.border_btn).setChecked(isBorderOn);
+        findViewById<SwitchCompat>(R.id.border_btn).setChecked(isBorderOn);
     }
 
     public fun flashToggle(readOnly: Boolean) {
@@ -78,7 +79,7 @@ class SettingsActivity : AppCompatActivity() {
             editor.putBoolean("flashEnabled", isBorderOn)
             editor.apply()
         }
-        findViewById<Switch>(R.id.flashOnBtn).setChecked(isBorderOn);
+        findViewById<SwitchCompat>(R.id.flashOnBtn).setChecked(isBorderOn);
     }
 
     public fun shutterSoundToggle(readOnly: Boolean) {
@@ -92,7 +93,7 @@ class SettingsActivity : AppCompatActivity() {
             editor.putBoolean("shutterSound", isBorderOn)
             editor.apply()
         }
-        findViewById<Switch>(R.id.shutterSoundBtn).setChecked(isBorderOn);
+        findViewById<SwitchCompat>(R.id.shutterSoundBtn).setChecked(isBorderOn);
     }
 
     public fun separatePhotosToggle(readOnly: Boolean) {
@@ -106,7 +107,7 @@ class SettingsActivity : AppCompatActivity() {
             editor.putBoolean("separatePhotos", isBorderOn)
             editor.apply()
         }
-        findViewById<Switch>(R.id.separateBtn).setChecked(isBorderOn);
+        findViewById<SwitchCompat>(R.id.separateBtn).setChecked(isBorderOn);
     }
 
     public fun gridToggle(readOnly: Boolean) {
@@ -120,7 +121,7 @@ class SettingsActivity : AppCompatActivity() {
             editor.putBoolean("grid", isGridOn)
             editor.apply()
         }
-        findViewById<Switch>(R.id.grid_btn).setChecked(isGridOn);
+        findViewById<SwitchCompat>(R.id.grid_btn).setChecked(isGridOn);
     }
 
 }

@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
+    android:fontFamily="@font/nunito_regular"
     android:orientation="vertical"
     android:background="@color/grey"
     tools:context=".SettingsActivity">
@@ -37,7 +39,7 @@
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="Separate Photos"
-                      android:fontFamily="casual"
+                      android:fontFamily="@font/nunito_regular"
                       android:textColor="@color/white"
                       android:textSize="18sp"
                       android:textStyle="bold"
@@ -46,24 +48,32 @@
                       android:layout_marginBottom="16dp"/>
 
                   <!-- Switch Button -->
-                  <Switch
+                  <androidx.appcompat.widget.SwitchCompat
                       android:onClick="separatePhotosToggleView"
                       android:id="@+id/separateBtn"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:thumb="@drawable/switch_thumb_custom"
                       android:textOff="Off"
                       android:textOn="On"
                       android:checked="false"
+                      app:trackTint="@color/switch_track_selector"
+                      app:thumbTint="@color/switch_thumb_selector"
                       android:layout_below="@id/labelSeparatePhotos"
                       android:layout_centerHorizontal="true"/>
 
-                  <View
-                      android:layout_marginTop="20dp"
-                      android:background="@color/white"
-                      android:layout_below="@+id/separateBtn"
-                      android:layout_width="match_parent"
-                      android:layout_height="2dp" />
+
+                    <LinearLayout
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="15dp"
+                        android:gravity="center"
+                        android:layout_below="@+id/separateBtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <View
+                            android:background="@color/white"
+                            android:layout_width="200dp"
+                            android:layout_height="2dp" />
+                    </LinearLayout>
               </RelativeLayout>
 
 
@@ -76,7 +86,7 @@
                   android:padding="2dp">
                   <TextView
 
-                      android:fontFamily="casual"
+                      android:fontFamily="@font/nunito_regular"
                       android:id="@+id/shutterSound"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
@@ -89,29 +99,39 @@
                       android:layout_marginBottom="16dp"/>
 
                   <!-- Switch Button -->
-                  <Switch
+                  <androidx.appcompat.widget.SwitchCompat
                       android:onClick="shutterSoundToggleView"
                       android:id="@+id/shutterSoundBtn"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:thumb="@drawable/switch_thumb_custom"
                       android:textOff="Off"
                       android:textOn="On"
                       android:checked="false"
+                      app:trackTint="@color/switch_track_selector"
+                      app:thumbTint="@color/switch_thumb_selector"
                       android:layout_below="@id/shutterSound"
                       android:layout_centerHorizontal="true"/>
 
 
-                  <View
+
+                  <LinearLayout
                       android:layout_marginTop="20dp"
-                      android:background="@color/white"
+                      android:layout_marginBottom="15dp"
+                      android:gravity="center"
                       android:layout_below="@+id/shutterSoundBtn"
                       android:layout_width="match_parent"
-                      android:layout_height="2dp" />
+                      android:layout_height="wrap_content">
+                      <View
+                          android:background="@color/white"
+                          android:layout_width="200dp"
+                          android:layout_height="2dp" />
+                  </LinearLayout>
+
               </RelativeLayout>
 
 
               <RelativeLayout
+                  android:visibility="gone"
                   android:layout_below="@+id/layout_2"
                   android:id="@+id/layout_3"
                   android:layout_weight="1"
@@ -133,13 +153,14 @@
                       android:layout_marginBottom="16dp"/>
 
                   <!-- Switch Button -->
-                  <Switch
+                  <androidx.appcompat.widget.SwitchCompat
                       android:id="@+id/flashOnBtn"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:thumb="@drawable/switch_thumb_custom"
                       android:textOff="Off"
                       android:textOn="On"
+                      app:trackTint="@color/switch_track_selector"
+                      app:thumbTint="@color/switch_thumb_selector"
                       android:checked="false"
                       android:onClick="flashToggleView"
                       android:layout_below="@id/flash_on"
@@ -163,7 +184,8 @@
                   android:padding="2dp">
                   <TextView
 
-                      android:fontFamily="casual"
+
+                      android:fontFamily="@font/nunito_regular"
                       android:id="@+id/border"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
@@ -176,25 +198,34 @@
                       android:layout_marginBottom="16dp"/>
 
                   <!-- Switch Button -->
-                  <Switch
+                  <androidx.appcompat.widget.SwitchCompat
 
                       android:onClick="borderToggleView"
                       android:id="@+id/border_btn"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:thumb="@drawable/switch_thumb_custom"
                       android:textOff="Off"
                       android:textOn="On"
+                      app:trackTint="@color/switch_track_selector"
+                      app:thumbTint="@color/switch_thumb_selector"
                       android:checked="false"
                       android:layout_below="@id/border"
                       android:layout_centerHorizontal="true"/>
 
-                  <View
+
+                  <LinearLayout
                       android:layout_marginTop="20dp"
-                      android:background="@color/white"
+                      android:layout_marginBottom="15dp"
+                      android:gravity="center"
                       android:layout_below="@+id/border_btn"
                       android:layout_width="match_parent"
-                      android:layout_height="2dp" />
+                      android:layout_height="wrap_content">
+                      <View
+                          android:background="@color/white"
+                          android:layout_width="200dp"
+                          android:layout_height="2dp" />
+                  </LinearLayout>
+
               </RelativeLayout>
 
 
@@ -207,7 +238,7 @@
                   android:padding="2dp">
                   <TextView
 
-                      android:fontFamily="casual"
+                      android:fontFamily="@font/nunito_regular"
                       android:id="@+id/grid_text"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
@@ -220,76 +251,89 @@
                       android:layout_marginBottom="16dp"/>
 
                   <!-- Switch Button -->
-                  <Switch
+                  <androidx.appcompat.widget.SwitchCompat
 
                       android:onClick="gridToggleView"
                       android:id="@+id/grid_btn"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:thumb="@drawable/switch_thumb_custom"
                       android:textOff="Off"
+                      app:trackTint="@color/switch_track_selector"
+                      app:thumbTint="@color/switch_thumb_selector"
                       android:textOn="On"
                       android:checked="false"
                       android:layout_below="@id/grid_text"
                       android:layout_centerHorizontal="true"/>
 
-                  <View
+
+
+                  <LinearLayout
                       android:layout_marginTop="20dp"
-                      android:background="@color/white"
+                      android:layout_marginBottom="15dp"
+                      android:gravity="center"
                       android:layout_below="@+id/grid_btn"
                       android:layout_width="match_parent"
-                      android:layout_height="2dp" />
-              </RelativeLayout>
-
-
-              <RelativeLayout
-                  android:id="@+id/layout_5"
-                  android:layout_below="@+id/layout_grid"
-                  android:layout_weight="1"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:padding="16dp">
-
-                  <TextView
-                      android:id="@+id/rateus"
-                      android:gravity="center"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:text="⭐ Rate Us"
-                      android:textColor="@color/white"
-                      android:textSize="18sp"
-                      android:textStyle="bold"/>
-
-
-                  <TextView
-                      android:layout_marginTop="10dp"
-                      android:layout_below="@+id/rateus"
-                      android:id="@+id/about"
-                      android:gravity="center"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:text="If you find any bug or error, please mail:"
-                      android:textColor="@color/white"
-                      android:textSize="18sp"
-                      android:textStyle="bold"/>
-
-                  <TextView
-
-                      android:textAlignment="center"
-                      android:gravity="center"
-                      android:layout_below="@+id/about"
-                      android:id="@+id/about_email"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:text="india@fennecstereo.com"
-                      android:textColor="@color/white"
-                      android:textSize="18sp"
-                      android:textStyle="bold"
-                      android:layout_marginBottom="16dp"/>
+                      android:layout_height="wrap_content">
+                      <View
+                          android:background="@color/white"
+                          android:layout_width="200dp"
+                          android:layout_height="2dp" />
+                  </LinearLayout>
 
               </RelativeLayout>
+
+
+
           </LinearLayout>
       </ScrollView>
 
+    <RelativeLayout
+        android:layout_alignParentBottom="true"
+        android:id="@+id/layout_5"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:fontFamily="@font/nunito_regular"
+            android:id="@+id/rateus"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="⭐ Rate Us"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"/>
+
+
+        <TextView
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/rateus"
+            android:id="@+id/about"
+            android:fontFamily="@font/nunito_regular"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="If you find any bug or error, please mail:"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:fontFamily="@font/nunito_regular"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:layout_below="@+id/about"
+            android:id="@+id/about_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="india@fennecstereo.com"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>

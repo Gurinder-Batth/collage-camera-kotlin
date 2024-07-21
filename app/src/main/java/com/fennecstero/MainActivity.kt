@@ -5,14 +5,20 @@ import android.app.Activity
 import android.app.ProgressDialog
 import android.content.ContentResolver
 import android.content.ContentUris
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.media.AudioAttributes
 import android.media.SoundPool
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.provider.MediaStore
 import android.util.Log
 import android.util.Rational
@@ -23,6 +29,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -53,6 +60,9 @@ class MainActivity : AppCompatActivity() {
     private var imageTwoCaptured = false
     private lateinit var soundPool: SoundPool
     private var shutterSoundId: Int = 0
+
+    private var backCameraOpen: Int = 0
+
     private var zoomRatio = 2f // Initial zoom ratio
 
     private lateinit var whatClickId: TextView
@@ -73,6 +83,7 @@ class MainActivity : AppCompatActivity() {
 
         flashToggle(true)
         borderToggle(true)
+        roateVerticalToggle(true)
 
         window.statusBarColor = resources.getColor(android.R.color.black)
         // Check if the app has permission to read and write external storage
@@ -87,9 +98,21 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
+        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
         // set on click listener for the button of capture photo
         // it calls a method which is implemented below
         findViewById<ImageView>(R.id.camera_capture_button).setOnClickListener {
+            // Vibrate for 50 milliseconds
+            if (vibrator.hasVibrator()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+                } else {
+                    // For API levels below 26
+                    @Suppress("DEPRECATION")
+                    vibrator.vibrate(50)
+                }
+            }
             takePhoto()
         }
 
@@ -208,7 +231,7 @@ class MainActivity : AppCompatActivity() {
                         findViewById<ImageView>(R.id.iv_capture).visibility = View.VISIBLE
                         findViewById<ImageView>(R.id.iv_capture).setImageURI(savedUri)
                         findViewById<ImageView>(R.id.iv_capture2).visibility = View.GONE
-                        whatClickId.text = "RIGHT IMAGE CLICK"
+                        whatClickId.text = "RIGHT CLICK"
                         linearLayoutCamera.visibility = View.VISIBLE
                         previewImageLayout.visibility = View.GONE
                     }
@@ -233,6 +256,15 @@ class MainActivity : AppCompatActivity() {
             })
     }
 
+    public fun cameraSwitch(view: View) {
+        if (backCameraOpen == 0) {
+            backCameraOpen = 1;
+        }
+        else {
+            backCameraOpen = 0;
+        }
+        startCamera();
+    }
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
@@ -245,22 +277,28 @@ class MainActivity : AppCompatActivity() {
             val preview = Preview.Builder()
                 .build()
                 .also {
-                    it.setSurfaceProvider(viewFinder.getSurfaceProvider())
+                    it.setSurfaceProvider(viewFinder.surfaceProvider)
                 }
 
-            // Define your desired aspect ratio (4:5)
+            // Define your desired aspect ratio (4:3)
             val aspectRatio = Rational(4, 3)
             val resolution = Size(
-                aspectRatio.numerator * 1200,  // Adjust the width as needed (e.g., 200)
-                aspectRatio.denominator * 1500 // Adjust the height as needed (e.g., 250)
+                2048,  // Set width to a fixed value (e.g., 2048)
+                1536   // Set height according to 4:3 aspect ratio
             )
 
             imageCapture = ImageCapture.Builder()
-                .setTargetResolution(resolution)
+                .setTargetAspectRatio(AspectRatio.RATIO_4_3)  // Ensure the aspect ratio is 4:3
+//                .setTargetResolution(resolution)\
+//                .setTargetAspectRatio(aspectRatio)
                 .build()
 
             // Select back camera as a default
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+            val cameraSelector = if (backCameraOpen == 0) {
+                CameraSelector.DEFAULT_BACK_CAMERA
+            } else {
+                CameraSelector.DEFAULT_FRONT_CAMERA
+            }
 
             try {
                 // Unbind use cases before rebinding
@@ -275,7 +313,6 @@ class MainActivity : AppCompatActivity() {
             }
         }, ContextCompat.getMainExecutor(this))
     }
-
 
     private fun startCamera2() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
@@ -371,6 +408,7 @@ class MainActivity : AppCompatActivity() {
             progressDialog.show()
 
             val imageHelper = ImageManipulationHelper(this)
+            val collageMaker = CollageMaker(this)
 
             val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
             var isseparatePhotos = sharedPreferences.getBoolean("separatePhotos", false)
@@ -385,9 +423,19 @@ class MainActivity : AppCompatActivity() {
                 val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
                 var borderCheck = sharedPreferences.getBoolean("borderOn", false)
 
+                var roateVertical = sharedPreferences.getBoolean("roateVertical", false)
 
-                if (!isseparatePhotos) {
-                    imageHelper.createAndSaveCollage(uriImage1, uriImage2, "${formattedTimestamp}_collage.png", borderCheck)
+                if (roateVertical) {
+                    collageMaker.createAndSaveCollage(uriImage1, uriImage2, "${formattedTimestamp}_collage.png", borderCheck, true)
+                }
+                else {
+                      collageMaker.createAndSaveCollage(uriImage1, uriImage2, "${formattedTimestamp}_collage.png", borderCheck, false)
+                }
+
+                if (isseparatePhotos) {
+                    // Save image1 and image2 separately
+                    saveImageToGallery(uriImage1, "${formattedTimestamp}_image1.png")
+                    saveImageToGallery(uriImage2, "${formattedTimestamp}_image2.png")
                 }
 
 
@@ -409,6 +457,57 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
         }
     }
+
+
+    private fun saveImageToGallery(uri: Uri, fileName: String) {
+        val resolver = contentResolver
+
+        // Load the bitmap from the URI
+        val bitmap = MediaStore.Images.Media.getBitmap(resolver, uri)
+
+        // Resize and crop the bitmap to a 4:3 aspect ratio
+        val croppedBitmap = cropToAspectRatio(bitmap, 4, 5)
+
+        // Create content values for the image
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+        }
+
+        // Insert the new image and get the URI
+        val imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        imageUri?.let {
+            val outputStream = resolver.openOutputStream(it)
+            outputStream?.let { stream ->
+                croppedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                stream.close()
+            }
+        }
+    }
+
+    private fun cropToAspectRatio(bitmap: Bitmap, aspectX: Int, aspectY: Int): Bitmap {
+        val width = bitmap.width
+        val height = bitmap.height
+        val newWidth: Int
+        val newHeight: Int
+
+        if (width * aspectY > height * aspectX) {
+            // Crop width to maintain aspect ratio
+            newWidth = height * aspectX / aspectY
+            newHeight = height
+        } else {
+            // Crop height to maintain aspect ratio
+            newWidth = width
+            newHeight = width * aspectY / aspectX
+        }
+
+        val xOffset = (width - newWidth) / 2
+        val yOffset = (height - newHeight) / 2
+
+        return Bitmap.createBitmap(bitmap, xOffset, yOffset, newWidth, newHeight)
+    }
+
 
     private fun deleteImage() {
         val contentResolver = contentResolver
@@ -457,11 +556,11 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.textViewFlash).setText("Flash " + flashTxt);
         if (isFlashEnabled) {
             findViewById<TextView>(R.id.textViewFlash).setTextColor(getResources().getColor(R.color.active));
-            findViewById<ImageView>(R.id.flash_on).setImageDrawable(getResources().getDrawable(R.drawable.flash_on_22_active));
+            findViewById<ImageView>(R.id.flash_on).setImageDrawable(getResources().getDrawable(R.drawable.torch_svgrepo_com_active));
         }
         else {
             findViewById<TextView>(R.id.textViewFlash).setTextColor(getResources().getColor(R.color.white));
-            findViewById<ImageView>(R.id.flash_on).setImageDrawable(getResources().getDrawable(R.drawable.flash_on_22));
+            findViewById<ImageView>(R.id.flash_on).setImageDrawable(getResources().getDrawable(R.drawable.torch_svgrepo_com));
         }
 
     }
@@ -470,6 +569,41 @@ class MainActivity : AppCompatActivity() {
 
     public fun borderOn(view: View) {
         borderToggle(false)
+    }
+
+    public fun roateVertical(view: View) {
+        roateVerticalToggle(false)
+    }
+
+    public fun roateVerticalToggle(readOnly: Boolean) {
+        // Initialize SharedPreferences
+        val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        var roateVertical = sharedPreferences.getBoolean("roateVertical", false)
+        // Save the toggle state to SharedPreferences
+        if (!readOnly) {
+            roateVertical = !roateVertical
+            editor.putBoolean("roateVertical", roateVertical)
+            editor.apply()
+        }
+        var flashTxt:String = "On";
+        if (!roateVertical) {
+            flashTxt = "Off";
+        }
+        findViewById<TextView>(R.id.borderOnTxt).setText("roateVertical " + flashTxt);
+
+        if (roateVertical) {
+            findViewById<TextView>(R.id.roateVerticalTxt).setText("Horizontal");
+            findViewById<TextView>(R.id.roateVerticalTxt).setTextColor(getResources().getColor(R.color.active));
+            findViewById<ImageView>(R.id.roateVertical).setImageDrawable(getResources().getDrawable(R.drawable.horizontal_svgrepo_com));
+        }
+        else {
+            findViewById<TextView>(R.id.roateVerticalTxt).setText("Vertical");
+            findViewById<TextView>(R.id.roateVerticalTxt).setTextColor(getResources().getColor(R.color.white));
+            findViewById<ImageView>(R.id.roateVertical).setImageDrawable(getResources().getDrawable(R.drawable.vertical_svgrepo_com));
+
+            borderToggle(true)
+        }
     }
 
     public fun borderToggle(readOnly: Boolean) {
@@ -493,10 +627,12 @@ class MainActivity : AppCompatActivity() {
         if (isBorderOn) {
             findViewById<TextView>(R.id.borderOnTxt).setTextColor(getResources().getColor(R.color.active));
             findViewById<ImageView>(R.id.border).setImageDrawable(getResources().getDrawable(R.drawable.border_radius_22_jan_active));
+            findViewById<LinearLayout>(R.id.previewImageLayout).setBackgroundColor(getResources().getColor(R.color.white));
         }
         else {
             findViewById<TextView>(R.id.borderOnTxt).setTextColor(getResources().getColor(R.color.white));
             findViewById<ImageView>(R.id.border).setImageDrawable(getResources().getDrawable(R.drawable.border_radius_22_jan));
+            findViewById<LinearLayout>(R.id.previewImageLayout).setBackgroundColor(getResources().getColor(R.color.black));
         }
     }
 

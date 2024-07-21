@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -16,6 +17,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -97,8 +99,8 @@ public class ImageManipulationHelper {
 //
 //        if (borderCheckBox) {
 //            // Apply border to images
-//            bitmap1 = applyBorder(bitmap1);
-//            bitmap2 = applyBorder(bitmap2);
+////            bitmap1 = applyBorder(bitmap1);
+////            bitmap2 = applyBorder(bitmap2);
 //        }
 //
 //        // Calculate the target width and height for the collage
@@ -120,10 +122,10 @@ public class ImageManipulationHelper {
 //        // Save the collage bitmap to a file
 //        return saveBitmapToFile(collageBitmap, collageFilename);
 //    }
-
+// working code 6 Jul
     public Uri createAndSaveCollage(Uri imageUri1, Uri imageUri2, String collageFilename, boolean applyBorder) {
-        Bitmap bitmap1 = loadScaledBitmapFromUri(imageUri1, 800, 1000);  // Example max size
-        Bitmap bitmap2 = loadScaledBitmapFromUri(imageUri2, 800, 1000);  // Example max size
+        Bitmap bitmap1 = loadScaledBitmapFromUri(imageUri1, 1600, 2000);  // Higher resolution example
+        Bitmap bitmap2 = loadScaledBitmapFromUri(imageUri2, 1600, 2000);  // Higher resolution example
 
         if (bitmap1 == null || bitmap2 == null) {
             return null;
@@ -155,7 +157,9 @@ public class ImageManipulationHelper {
         Bitmap collageBitmap = Bitmap.createBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(collageBitmap);
-        canvas.drawColor(Color.WHITE);  // Background color
+        if (applyBorder) {
+            canvas.drawColor(Color.WHITE);  // Background color
+        }
 
         // Calculate positions to center the images
         int left1 = (targetWidth / 2) - bitmap1.getWidth();
@@ -172,6 +176,143 @@ public class ImageManipulationHelper {
         // Save the collage bitmap to a file
         return saveBitmapToFile(collageBitmap, collageFilename);
     }
+
+
+//    public Uri createAndSaveCollage(Uri imageUri1, Uri imageUri2, String collageFilename, boolean applyBorder, boolean isHor) {
+//        Bitmap bitmap1 = loadScaledBitmapFromUri(imageUri1, 800, 1000);  // Increased resolution example
+//        Bitmap bitmap2 = loadScaledBitmapFromUri(imageUri2, 800, 1000);  // Increased resolution example
+//
+//        if (bitmap1 == null || bitmap2 == null) {
+//            return null;
+//        }
+//
+//        // Crop the bitmaps to a 4:5 aspect ratio
+//        bitmap1 = cropToAspectRatio(bitmap1, 4, 5);
+//        bitmap2 = cropToAspectRatio(bitmap2, 4, 5);
+//
+//        if (applyBorder) {
+//            // Apply border to images
+//            bitmap1 = applyBorder(bitmap1, 20, 20, 20, 10);
+//            bitmap2 = applyBorder(bitmap2, 20, 20, 10, 20);
+//        }
+//
+//        // Calculate the target dimensions for the collage to maintain a 4:5 aspect ratio
+//        int targetHeight = Math.max(bitmap1.getHeight(), bitmap2.getHeight());
+//        int targetWidth = (int) (targetHeight * 4.0 / 5.0) * 2;
+//
+//        // Ensure targetWidth fits both images
+//        if (bitmap1.getWidth() + bitmap2.getWidth() > targetWidth) {
+//            // Scale down the images to fit the target width
+//            float scale = (float) targetWidth / (bitmap1.getWidth() + bitmap2.getWidth());
+//            bitmap1 = Bitmap.createScaledBitmap(bitmap1, (int) (bitmap1.getWidth() * scale), (int) (bitmap1.getHeight() * scale), true);
+//            bitmap2 = Bitmap.createScaledBitmap(bitmap2, (int) (bitmap2.getWidth() * scale), (int) (bitmap2.getHeight() * scale), true);
+//        }
+//
+//        // Create a new bitmap with the target dimensions
+//        Bitmap collageBitmap = Bitmap.createBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888);
+//
+//        Canvas canvas = new Canvas(collageBitmap);
+//        if (applyBorder) {
+//            canvas.drawColor(Color.WHITE);  // Background color
+//        }
+//
+//        // Rotate canvas if isHor is true (assuming isHor means horizontal orientation)
+//        if (isHor) {
+//            canvas.rotate(90, collageBitmap.getWidth() / 2, collageBitmap.getHeight() / 2);
+//        }
+//
+//        // Calculate positions to center the images
+//        int left1 = (targetWidth / 2) - bitmap1.getWidth();
+//        int top1 = (targetHeight - bitmap1.getHeight()) / 2;
+//        int left2 = targetWidth / 2;
+//        int top2 = (targetHeight - bitmap2.getHeight()) / 2;
+//
+//        // Draw the first image onto the collage
+//        canvas.drawBitmap(bitmap1, left1, top1, null);
+//
+//        // Draw the second image next to the first image
+//        canvas.drawBitmap(bitmap2, left2, top2, null);
+//
+//        // Save the collage bitmap to a file
+//        return saveBitmapToFile(collageBitmap, collageFilename);
+//    }
+//
+
+
+    private Bitmap getBitmapFromUri(Uri uri) {
+        try {
+            InputStream inputStream = context.getContentResolver().openInputStream(uri);
+            return BitmapFactory.decodeStream(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Uri createAndSaveCollage(Uri imageUri1, Uri imageUri2, String collageFilename, boolean applyBorder, boolean isHor) {
+        Bitmap bitmap1 = loadScaledBitmapFromUri(imageUri1, 800, 1000);  // Increased resolution example
+        Bitmap bitmap2 = loadScaledBitmapFromUri(imageUri2, 800, 1000);  // Increased resolution example
+
+//        Bitmap bitmap1 = getBitmapFromUri(imageUri1);  // Increased resolution example
+//        Bitmap bitmap2 = getBitmapFromUri(imageUri2);  // Increased resolution example
+//
+//        if (bitmap1 == null || bitmap2 == null) {
+//            return null;
+//        }
+
+        // Crop the bitmaps to a 4:5 aspect ratio
+//        bitmap1 = cropToAspectRatio(bitmap1, 4, 5);
+//        bitmap2 = cropToAspectRatio(bitmap2, 4, 5);
+
+        if (applyBorder) {
+            // Apply border to images
+            bitmap1 = applyBorder(bitmap1, 20, 20, 20, 10);
+            bitmap2 = applyBorder(bitmap2, 20, 20, 10, 20);
+        }
+
+        // Determine the target height and width maintaining 4:5 aspect ratio
+        int targetHeight = Math.max(bitmap1.getHeight(), bitmap2.getHeight());
+        int targetWidth = (int) (targetHeight * 4.0 / 5.0) * 2;
+
+        // Scale down images if combined width exceeds target width
+        if (bitmap1.getWidth() + bitmap2.getWidth() > targetWidth) {
+            float scale = (float) targetWidth / (bitmap1.getWidth() + bitmap2.getWidth());
+            bitmap1 = Bitmap.createScaledBitmap(bitmap1, (int) (bitmap1.getWidth() * scale), (int) (bitmap1.getHeight() * scale), true);
+            bitmap2 = Bitmap.createScaledBitmap(bitmap2, (int) (bitmap2.getWidth() * scale), (int) (bitmap2.getHeight() * scale), true);
+        }
+
+        // Adjust targetWidth to be exact based on combined width of scaled images
+        targetWidth = bitmap1.getWidth() + bitmap2.getWidth();
+
+        // Create a new bitmap with the target dimensions
+        Bitmap collageBitmap = Bitmap.createBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(collageBitmap);
+        if (applyBorder) {
+            canvas.drawColor(Color.RED);  // Background color
+        }
+
+        // Rotate canvas if isHor is true (assuming isHor means horizontal orientation)
+        if (isHor) {
+            canvas.rotate(90, collageBitmap.getWidth() / 2, collageBitmap.getHeight() / 2);
+        }
+
+        // Calculate positions to center the images
+        int left1 = 0;
+        int top1 = (targetHeight - bitmap1.getHeight()) / 2;
+        int left2 = bitmap1.getWidth();
+        int top2 = (targetHeight - bitmap2.getHeight()) / 2;
+
+        // Draw the first image onto the collage
+        canvas.drawBitmap(bitmap1, left1, top1, null);
+
+        // Draw the second image next to the first image
+        canvas.drawBitmap(bitmap2, left2, top2, null);
+
+        // Save the collage bitmap to a file
+        return saveBitmapToFile(collageBitmap, collageFilename);
+    }
+
 
     private Bitmap loadScaledBitmapFromUri(Uri uri, int maxWidth, int maxHeight) {
         // Load a scaled-down version of the image to save memory

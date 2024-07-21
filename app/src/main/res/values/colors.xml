@@ -3,5 +3,6 @@
     <color name="black">#262626</color>
     <color name="white">#FFFFFFFF</color>
     <color name="grey">#262626</color>
+    <color name="fade">#DCD7D7</color>
     <color name="active">#D8A60D</color>
 </resources>
