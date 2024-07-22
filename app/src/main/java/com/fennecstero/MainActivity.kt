@@ -223,10 +223,6 @@ class MainActivity : AppCompatActivity() {
 
                     val savedUri = Uri.fromFile(photoFile)
 
-
-
-
-
                     if (imageOneCaptured == false && imageTwoCaptured == false) {
                         imageOneCaptured = true
                          uriImage1 = savedUri
@@ -252,9 +248,7 @@ class MainActivity : AppCompatActivity() {
                     // iv_capture2
 
                     val msg = "Photo capture succeeded: $savedUri"
-//                    Toast.makeText(baseContext, msg, Toast.LENGTH_LONG).show()
                     Log.d(TAG, msg)
-//                    startCamera2()
                 }
             })
     }
@@ -317,48 +311,6 @@ class MainActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
-    private fun startCamera2() {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-
-        cameraProviderFuture.addListener(Runnable {
-
-            // Used to bind the lifecycle of cameras to the lifecycle owner
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
-            // Preview
-            val preview = Preview.Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(viewFinder2.getSurfaceProvider())
-                }
-
-            imageCapture = ImageCapture.Builder()
-                .setTargetResolution(Size(250, 625)) // Set your desired low resolution
-                .build()
-
-            // Select back camera as a default
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
-            try {
-                // Unbind use cases before rebinding
-                cameraProvider.unbindAll()
-
-                // Bind use cases to camera
-               var camera = cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageCapture
-                )
-
-                // Example of how to zoom in by a factor of 2
-//                val cameraControl = camera.cameraControl
-//                cameraControl.setZoomRatio(3f)
-
-            } catch (exc: Exception) {
-                Log.e(TAG, "Use case binding failed", exc)
-            }
-
-        }, ContextCompat.getMainExecutor(this))
-    }
-
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
@@ -410,7 +362,6 @@ class MainActivity : AppCompatActivity() {
             progressDialog.setCancelable(false)
             progressDialog.show()
 
-            val imageHelper = ImageManipulationHelper(this)
             val collageMaker = CollageMaker(this)
 
             val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
@@ -454,8 +405,6 @@ class MainActivity : AppCompatActivity() {
                     progressDialog.dismiss()
 
                     if (!isseparatePhotos) {
-//                        deleteFileFromUri(contentResolver, uriImage1)
-//                        deleteFileFromUri(contentResolver, uriImage2)
                     }
                     Toast.makeText(this@MainActivity, "Images saved to gallery", Toast.LENGTH_SHORT).show()
 
@@ -685,16 +634,6 @@ class MainActivity : AppCompatActivity() {
 
         // Set padding for LinearLayout
         linearLayout.setPadding(0, paddingInPixels, 0, paddingInPixels)
-
-        // Set margins for ImageView1
-//        val layoutParams1 = imageView1.layoutParams as LinearLayout.LayoutParams
-//        layoutParams1.setMargins(0, 0, marginInPixels, 0) // Right margin
-//        imageView1.layoutParams = layoutParams1
-//
-//        // Set margins for ImageView2
-//        val layoutParams2 = imageView2.layoutParams as LinearLayout.LayoutParams
-//        layoutParams2.setMargins(marginInPixels, 0, 0, 0) // Left margin
-//        imageView2.layoutParams = layoutParams2
 
     }
 
