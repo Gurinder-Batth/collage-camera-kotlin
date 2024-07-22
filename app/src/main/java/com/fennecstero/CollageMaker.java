@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -25,6 +26,62 @@ public class CollageMaker {
         this.context = context;
     }
 
+    public void saveImagesIn45Canvas(Uri imageUri1, Uri imageUri2, String outputFileName) throws IOException {
+        // Load images from URIs
+        List<Bitmap> images = Arrays.asList(
+                MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri1),
+                MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri2)
+        );
+
+        // Dimensions for a 4:5 aspect ratio
+        int canvasWidth = 2400;  // Width of the canvas (4:5 aspect ratio)
+        int canvasHeight = 3000;  // Height of the canvas (4:5 aspect ratio)
+
+        // Create a new Bitmap for the collage with the specified dimensions
+        Bitmap collage = Bitmap.createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(collage);
+
+        // Fill the background with white color
+        canvas.drawColor(Color.WHITE);
+
+        // Calculate the size for each image to fit within the canvas dimensions while maintaining aspect ratio
+        int maxWidth = canvasWidth / 2;
+        int maxHeight = canvasHeight;
+
+        // Draw each image onto the canvas with appropriate scaling and positioning
+        for (int i = 0; i < images.size(); i++) {
+            Bitmap image = images.get(i);
+
+            // Scale the image to fit within the max dimensions
+            Bitmap scaledImage = scaleToFit(image, maxWidth, maxHeight);
+
+            // Calculate the position for the image (centered in its half of the canvas)
+            int x = i * maxWidth + (maxWidth - scaledImage.getWidth()) / 2;
+            int y = (canvasHeight - scaledImage.getHeight()) / 2;
+
+            // Draw the scaled image onto the canvas
+            canvas.drawBitmap(scaledImage, x, y, null);
+        }
+
+        // Save the collage to the gallery
+        saveImageToGallery(context, collage, outputFileName);
+    }
+
+    private Bitmap scaleToFit(Bitmap bitmap, int maxWidth, int maxHeight) {
+        int originalWidth = bitmap.getWidth();
+        int originalHeight = bitmap.getHeight();
+
+        // Calculate scaling factor
+        float scale = Math.min((float) maxWidth / originalWidth, (float) maxHeight / originalHeight);
+
+        // Calculate new dimensions
+        int scaledWidth = Math.round(scale * originalWidth);
+        int scaledHeight = Math.round(scale * originalHeight);
+
+        // Scale the bitmap
+        return Bitmap.createScaledBitmap(bitmap, scaledWidth, scaledHeight, true);
+    }
+
     public void createAndSaveCollage(Uri imageUri1, Uri imageUri2, String outputFileName, boolean borderCheck, boolean isHor) throws IOException {
         // Load images from URIs
         List<Bitmap> images = Arrays.asList(
@@ -33,8 +90,8 @@ public class CollageMaker {
         );
 
         // Dimensions for a 4:5 aspect ratio
-        int width = 1200;  // Width of the collage (4:5 aspect ratio)
-        int height = 1500;  // Height of the collage (4:5 aspect ratio)
+        int width = 2400;  // Width of the collage (4:5 aspect ratio)
+        int height = 3000;  // Height of the collage (4:5 aspect ratio)
 
 
         // Create a new Bitmap for the collage with the specified dimensions
@@ -129,9 +186,27 @@ public class CollageMaker {
         if (uri != null) {
             try (OutputStream out = context.getContentResolver().openOutputStream(uri)) {
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                notifySystemAboutNewImage(uri.getPath());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void notifySystemAboutNewImage(String imagePath) {
+        // Array of paths you want to scan for media
+        String[] paths = {imagePath};
+        // Array of MIME types to be scanned
+        String[] mimeTypes = {"image/*"};
+
+        // Callback invoked when scanning is complete
+        MediaScannerConnection.OnScanCompletedListener callback = new MediaScannerConnection.OnScanCompletedListener() {
+            @Override
+            public void onScanCompleted(String path, Uri uri) {
+                // Scan completed, you can perform any additional actions here
+            }
+        };
+        // Request media scanning
+        MediaScannerConnection.scanFile(context, paths, mimeTypes, callback);
     }
 }

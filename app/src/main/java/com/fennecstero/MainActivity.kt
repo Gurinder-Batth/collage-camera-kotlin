@@ -426,10 +426,18 @@ class MainActivity : AppCompatActivity() {
                 var roateVertical = sharedPreferences.getBoolean("roateVertical", false)
 
                 if (roateVertical) {
+                    if (borderCheck) {
+                        collageMaker.saveImagesIn45Canvas(uriImage1, uriImage2, "${formattedTimestamp}_collage.png");
+                    }
                     collageMaker.createAndSaveCollage(uriImage1, uriImage2, "${formattedTimestamp}_collage.png", borderCheck, true)
                 }
                 else {
-                      collageMaker.createAndSaveCollage(uriImage1, uriImage2, "${formattedTimestamp}_collage.png", borderCheck, false)
+                    if (borderCheck) {
+                        collageMaker.saveImagesIn45Canvas(uriImage1, uriImage2, "${formattedTimestamp}_collage.png");
+                    }
+                    else {
+                        collageMaker.createAndSaveCollage(uriImage1, uriImage2, "${formattedTimestamp}_collage.png", borderCheck, false)
+                    }
                 }
 
                 if (isseparatePhotos) {

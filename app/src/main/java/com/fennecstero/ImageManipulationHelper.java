@@ -69,10 +69,8 @@ public class ImageManipulationHelper {
     }
 
     private void notifySystemAboutNewImage(String imagePath) {
-
         // Array of paths you want to scan for media
         String[] paths = {imagePath};
-
         // Array of MIME types to be scanned
         String[] mimeTypes = {"image/*"};
 
@@ -83,7 +81,6 @@ public class ImageManipulationHelper {
                 // Scan completed, you can perform any additional actions here
             }
         };
-
         // Request media scanning
         MediaScannerConnection.scanFile(context, paths, mimeTypes, callback);
     }
