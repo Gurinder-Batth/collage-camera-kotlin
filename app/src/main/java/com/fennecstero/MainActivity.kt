@@ -10,7 +10,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.media.AudioAttributes
+import android.media.ExifInterface
 import android.media.SoundPool
 import android.net.Uri
 import android.os.Build
@@ -23,6 +25,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.util.Rational
 import android.util.Size
+import android.view.Surface
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -288,9 +291,9 @@ class MainActivity : AppCompatActivity() {
             )
 
             imageCapture = ImageCapture.Builder()
-                .setTargetAspectRatio(AspectRatio.RATIO_4_3)  // Ensure the aspect ratio is 4:3
-//                .setTargetResolution(resolution)\
-//                .setTargetAspectRatio(aspectRatio)
+                .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                .setTargetRotation(Surface.ROTATION_0)  // Always capture in portrait mode
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)  // Optional: Minimize latency for quick captures
                 .build()
 
             // Select back camera as a default
@@ -473,8 +476,11 @@ class MainActivity : AppCompatActivity() {
         // Load the bitmap from the URI
         val bitmap = MediaStore.Images.Media.getBitmap(resolver, uri)
 
+        // Handle bitmap orientation if needed
+        val orientedBitmap = handleBitmapOrientation(bitmap, uri)
+
         // Resize and crop the bitmap to a 4:3 aspect ratio
-        val croppedBitmap = cropToAspectRatio(bitmap, 4, 5)
+        val croppedBitmap = cropToAspectRatio(orientedBitmap, 4, 3)
 
         // Create content values for the image
         val contentValues = ContentValues().apply {
@@ -486,28 +492,40 @@ class MainActivity : AppCompatActivity() {
         // Insert the new image and get the URI
         val imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
         imageUri?.let {
-            val outputStream = resolver.openOutputStream(it)
-            outputStream?.let { stream ->
+            resolver.openOutputStream(it)?.use { stream ->
                 croppedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-                stream.close()
             }
         }
     }
 
-    private fun cropToAspectRatio(bitmap: Bitmap, aspectX: Int, aspectY: Int): Bitmap {
+    private fun handleBitmapOrientation(bitmap: Bitmap, uri: Uri): Bitmap {
+        val exif = ExifInterface(contentResolver.openInputStream(uri)!!)
+        val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+        val matrix = Matrix()
+
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+        }
+
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
+    private fun cropToAspectRatio(bitmap: Bitmap, aspectWidth: Int, aspectHeight: Int): Bitmap {
         val width = bitmap.width
         val height = bitmap.height
+        val aspectRatio = aspectWidth.toFloat() / aspectHeight
+
         val newWidth: Int
         val newHeight: Int
 
-        if (width * aspectY > height * aspectX) {
-            // Crop width to maintain aspect ratio
-            newWidth = height * aspectX / aspectY
+        if (width.toFloat() / height > aspectRatio) {
+            newWidth = (height * aspectRatio).toInt()
             newHeight = height
         } else {
-            // Crop height to maintain aspect ratio
             newWidth = width
-            newHeight = width * aspectY / aspectX
+            newHeight = (width / aspectRatio).toInt()
         }
 
         val xOffset = (width - newWidth) / 2
