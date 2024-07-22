@@ -666,17 +666,19 @@ class MainActivity : AppCompatActivity() {
         val marginInPixels = (marginInDp * density).toInt()
 
         // Set padding for LinearLayout
-        linearLayout.setPadding(paddingInPixels, paddingInPixels, paddingInPixels, paddingInPixels)
+        linearLayout.setPadding(0, paddingInPixels, 0, paddingInPixels)
 
         // Set margins for ImageView1
-        val layoutParams1 = imageView1.layoutParams as LinearLayout.LayoutParams
-        layoutParams1.setMargins(0, 0, marginInPixels, 0) // Right margin
-        imageView1.layoutParams = layoutParams1
+//        val layoutParams1 = imageView1.layoutParams as LinearLayout.LayoutParams
+//        layoutParams1.setMargins(0, 0, marginInPixels, 0) // Right margin
+//        imageView1.layoutParams = layoutParams1
+//
+//        // Set margins for ImageView2
+//        val layoutParams2 = imageView2.layoutParams as LinearLayout.LayoutParams
+//        layoutParams2.setMargins(marginInPixels, 0, 0, 0) // Left margin
+//        imageView2.layoutParams = layoutParams2
 
-        // Set margins for ImageView2
-        val layoutParams2 = imageView2.layoutParams as LinearLayout.LayoutParams
-        layoutParams2.setMargins(marginInPixels, 0, 0, 0) // Left margin
-        imageView2.layoutParams = layoutParams2    }
+    }
 
 
     // Define a function to delete a file from URI
