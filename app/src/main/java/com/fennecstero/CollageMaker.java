@@ -7,12 +7,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.media.ExifInterface;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -51,6 +53,9 @@ public class CollageMaker {
         // Draw each image onto the canvas with appropriate scaling and positioning
         for (int i = 0; i < images.size(); i++) {
             Bitmap image = images.get(i);
+
+            // Handle image orientation
+            image = handleBitmapOrientation(image, context.getContentResolver().openInputStream(imageUri1)); // Replace imageUri1 with correct URI
 
             // Scale the image to fit within the max dimensions
             Bitmap scaledImage = scaleToFit(image, maxWidth, maxHeight);
@@ -93,7 +98,6 @@ public class CollageMaker {
         int width = 2400;  // Width of the collage (4:5 aspect ratio)
         int height = 3000;  // Height of the collage (4:5 aspect ratio)
 
-
         // Create a new Bitmap for the collage with the specified dimensions
         Bitmap collage = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(collage);
@@ -112,7 +116,7 @@ public class CollageMaker {
         borderPaint.setColor(Color.WHITE);
         borderPaint.setStyle(Paint.Style.STROKE);
         if (borderCheck) {
-            borderPaint.setStrokeWidth(0);
+            borderPaint.setStrokeWidth(10); // Set border width
         }
 
         // Place each image within the grid cells
@@ -123,6 +127,9 @@ public class CollageMaker {
                 // Rotate images if horizontal flag is true
                 image = rotateBitmap(image, 90);
             }
+
+            // Handle image orientation
+            image = handleBitmapOrientation(image, context.getContentResolver().openInputStream(imageUri1)); // Replace imageUri1 with correct URI
 
             // Scale and crop the image to fit within the cell while maintaining aspect ratio
             Bitmap scaledImage = scaleAndCropBitmap(image, cellWidth, cellHeight);
@@ -208,5 +215,25 @@ public class CollageMaker {
         };
         // Request media scanning
         MediaScannerConnection.scanFile(context, paths, mimeTypes, callback);
+    }
+
+    private Bitmap handleBitmapOrientation(Bitmap bitmap, InputStream inputStream) throws IOException {
+        ExifInterface exif = new ExifInterface(inputStream);
+        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+        Matrix matrix = new Matrix();
+
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.postRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.postRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.postRotate(270);
+                break;
+        }
+
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 }
